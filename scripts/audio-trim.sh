@@ -86,7 +86,7 @@ trim_one_file() {
   echo "- End:    $end"
   echo ""
 
-  ffmpeg -y -ss "$start" -to "$end" -i "$input" -c:a aac -b:a 192k "$output"
+  ffmpeg -y -ss "$start" -to "$end" -i "$input" -c:a aac -b:a 160k "$output"
 
   echo "✅ Done: $output"
   echo ""
