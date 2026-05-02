@@ -60,7 +60,7 @@ audio-trim \
 
 - `MM:SS or HH:MM:SS` -> `eg. 00:11, 03:00, 00:00:11`
 - Output files are always written as `.m4a`
-- Audio is encoded as AAC at 192k
+- Audio is encoded as AAC at 160k
 - Output files are overwritten if they exist
 - Runs relative to the current folder
 
@@ -71,6 +71,22 @@ audio-trim \
 
 
 
-### 2. audio-publish
-Send processed files to Navidrome server.
-(update later)
+### 2. audio-youtube-download
+Download YouTube audio as `.m4a` using yt-dlp.
+
+#### Usage:
+
+`audio-youtube-download <url>`
+
+#### Example:
+
+`audio-youtube-download "https://www.youtube.com/watch?v=example"`
+
+### Notes:
+
+- Downloads to the current terminal folder
+- Uses the YouTube title and video ID as the filename
+- Prefers native `.m4a` audio and keeps it as-is to avoid audio re-encoding
+- Falls back to best audio and converts to `.m4a` when native `.m4a` is not available
+- Converted fallback audio uses AAC at 160k
+- Embeds the YouTube thumbnail as cover art

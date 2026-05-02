@@ -35,6 +35,7 @@ link_script() {
 }
 
 link_script "$SCRIPT_DIR/audio-trim.sh" "audio-trim"
+link_script "$SCRIPT_DIR/audio-youtube-download.sh" "audio-youtube-download"
 # link_script "$SCRIPT_DIR/audio-publish.sh" "audio-publish"
 
 echo ""
@@ -42,4 +43,4 @@ echo "✅ Setup complete."
 echo ""
 echo "You can now run:"
 echo "- audio-trim"
-echo "- audio-publish"
+echo "- audio-youtube-download"
