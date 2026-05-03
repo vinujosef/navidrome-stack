@@ -17,6 +17,7 @@ Focus:
 - creates ~/bin (if not exists)
 - links /scripts into ~/bin
 - makes them available globally (using symlinks)
+- future changes to scripts are picked up automatically because ~/bin points to the repo files
 
 ### 3. Run setup:
 - Run `chmod +x setup.sh && ./setup.sh`
@@ -25,11 +26,17 @@ Focus:
 
 ### 4. Requirement:
 - Make sure ~/bin is in your PATH:
+- Add this only once to avoid duplicate PATH lines in `.zshrc`:
 
 ```bash
 echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
+
+### 5. When to rerun setup:
+- after moving this repo to a different folder
+- after adding a new command script
+- if a symlink in ~/bin was deleted or broken
 
 ## 🔧 Tools
 
@@ -90,3 +97,56 @@ Download YouTube audio as `.m4a` using yt-dlp.
 - Falls back to best audio and converts to `.m4a` when native `.m4a` is not available
 - Converted fallback audio uses AAC at 160k
 - Embeds the YouTube thumbnail as cover art
+- Does not download playlists
+
+### 3. audio-publish
+Upload the current local folder to the Navidrome music folder on the server.
+
+#### Config:
+
+Create `.env` in the repo root:
+
+```bash
+SERVER="<ssh-user>@<server-host>"
+DEST='<remote-music-folder>'
+CATEGORIES='<category-one>|<category-two>|<category-three>'
+```
+
+#### Usage:
+
+Go into the folder you want to upload, then run:
+
+```bash
+audio-publish
+```
+
+The script asks which configured Navidrome folder to publish into:
+
+```text
+1. <category-one>
+2. <category-two>
+3. <category-three>
+...
+```
+
+#### Example:
+
+If you run `audio-publish` from a local folder:
+
+```text
+<local-music-work-folder>/<album-folder>
+```
+
+and choose a destination category, files are uploaded to:
+
+```text
+<DEST>/<selected-category>/<album-folder>
+```
+
+### Notes:
+
+- Uploads the contents of the current folder
+- Uses `rsync`, so repeated publishes only upload changed files
+- Creates the destination folder if missing
+- Uses the current folder name as the remote album/folder name
+- Sets remote folder permissions after upload
