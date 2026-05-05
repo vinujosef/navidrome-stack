@@ -40,7 +40,52 @@ source ~/.zshrc
 
 ## 🔧 Tools
 
-### 1. audio-trim
+### 1. audio-youtube-download
+Download YouTube audio as `.m4a` using yt-dlp.
+
+#### Usage:
+
+`audio-youtube-download <url>`
+
+#### Example:
+
+`audio-youtube-download "https://www.youtube.com/watch?v=example"`
+
+### Notes:
+
+- Downloads to the current terminal folder
+- Uses the YouTube title and video ID as the filename
+- Prefers native `.m4a` audio and keeps it as-is to avoid audio re-encoding
+- Falls back to best audio and converts to `.m4a` when native `.m4a` is not available
+- Converted fallback audio uses AAC at 160k
+- Embeds the YouTube thumbnail as cover art
+- Does not download playlists
+
+### 2. audio-flac-to-m4a
+Convert FLAC files to `.m4a` using ffmpeg.
+
+#### Usage:
+
+`audio-flac-to-m4a`
+
+#### Examples:
+
+```bash
+cd album-folder
+audio-flac-to-m4a
+```
+
+### Notes:
+
+- Converts FLAC files to AAC `.m4a`
+- Bitrate is always 160k
+- Converts every `.flac` file in the current folder
+- Output files are written to the same folder
+- Existing `.m4a` files are skipped
+- Metadata and cover art are copied when ffmpeg can preserve them
+- A temporary `.m4a` is written first, then renamed after conversion succeeds
+
+### 3. audio-trim
 Trim audio files using ffmpeg.
 
 #### Usage:
@@ -76,30 +121,7 @@ audio-trim \
 - +0.5 → reliable default
 - +0.7 / +0.9 → edge cases only
 
-
-
-### 2. audio-youtube-download
-Download YouTube audio as `.m4a` using yt-dlp.
-
-#### Usage:
-
-`audio-youtube-download <url>`
-
-#### Example:
-
-`audio-youtube-download "https://www.youtube.com/watch?v=example"`
-
-### Notes:
-
-- Downloads to the current terminal folder
-- Uses the YouTube title and video ID as the filename
-- Prefers native `.m4a` audio and keeps it as-is to avoid audio re-encoding
-- Falls back to best audio and converts to `.m4a` when native `.m4a` is not available
-- Converted fallback audio uses AAC at 160k
-- Embeds the YouTube thumbnail as cover art
-- Does not download playlists
-
-### 3. audio-publish
+### 4. audio-publish
 Upload the current local folder to the Navidrome music folder on the server.
 
 #### Config:
