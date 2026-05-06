@@ -51,7 +51,7 @@ Download YouTube audio as `.m4a` using yt-dlp.
 
 `audio-youtube-download "https://www.youtube.com/watch?v=example"`
 
-### Notes:
+#### Notes:
 
 - Downloads to the current terminal folder
 - Uses the YouTube title and video ID as the filename
@@ -61,7 +61,20 @@ Download YouTube audio as `.m4a` using yt-dlp.
 - Embeds the YouTube thumbnail as cover art
 - Does not download playlists
 
-### 2. audio-flac-to-m4a
+### 2. audio-filename-fix
+Fix common audio filename patterns in the current folder.
+
+#### Usage:
+
+`audio-filename-fix`
+
+The command asks which filename fix to run:
+
+```text
+1. Dot-dash spacing: rename '01.-Song.m4a' to '01. Song.m4a'
+```
+
+### 3. audio-flac-to-m4a
 Convert FLAC files to `.m4a` using ffmpeg.
 
 #### Usage:
@@ -75,7 +88,7 @@ cd album-folder
 audio-flac-to-m4a
 ```
 
-### Notes:
+#### Notes:
 
 - Converts FLAC files to AAC `.m4a`
 - Bitrate is always 160k
@@ -85,7 +98,7 @@ audio-flac-to-m4a
 - Metadata and cover art are copied when ffmpeg can preserve them
 - A temporary `.m4a` is written first, then renamed after conversion succeeds
 
-### 3. audio-trim
+### 4. audio-trim
 Trim audio files using ffmpeg.
 
 #### Usage:
@@ -105,9 +118,6 @@ audio-trim \
   song2.m4a 00:05 02:30 intro2.m4a
 ```
 
-### Notes:
-
-
 #### Time format:
 
 - `MM:SS or HH:MM:SS` -> `eg. 00:11, 03:00, 00:00:11`
@@ -121,7 +131,7 @@ audio-trim \
 - +0.5 → reliable default
 - +0.7 / +0.9 → edge cases only
 
-### 4. audio-publish
+### 5. audio-publish
 Upload the current local folder to the Navidrome music folder on the server.
 
 #### Config:
@@ -165,7 +175,7 @@ and choose a destination category, files are uploaded to:
 <DEST>/<selected-category>/<album-folder>
 ```
 
-### Notes:
+#### Notes:
 
 - Uploads the contents of the current folder
 - Uses `rsync`, so repeated publishes only upload changed files

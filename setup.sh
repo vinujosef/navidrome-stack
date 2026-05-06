@@ -34,8 +34,21 @@ link_script() {
   fi
 }
 
+remove_legacy_link() {
+  local command_name="$1"
+  local target_file="$BIN_DIR/$command_name"
+
+  if [ -L "$target_file" ]; then
+    rm "$target_file"
+    echo "🧹 Removed old command: $command_name"
+  fi
+}
+
+remove_legacy_link "audio-filename-fixing"
+
 link_script "$SCRIPT_DIR/audio-trim.sh" "audio-trim"
 link_script "$SCRIPT_DIR/audio-flac-to-m4a.sh" "audio-flac-to-m4a"
+link_script "$SCRIPT_DIR/audio-filename-fix.sh" "audio-filename-fix"
 link_script "$SCRIPT_DIR/audio-youtube-download.sh" "audio-youtube-download"
 link_script "$SCRIPT_DIR/audio-publish.sh" "audio-publish"
 
@@ -45,5 +58,6 @@ echo ""
 echo "You can now run:"
 echo "- audio-trim"
 echo "- audio-flac-to-m4a"
+echo "- audio-filename-fix"
 echo "- audio-youtube-download"
 echo "- audio-publish"
