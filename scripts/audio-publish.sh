@@ -117,8 +117,8 @@ publish_folder() {
   ssh "$SERVER" "mkdir -p -- $quoted_remote_dir && chmod 755 -- $quoted_remote_dir"
 
   echo ""
-  echo "⬆️ Uploading files..."
-  rsync -av --progress --exclude=".*" -- "$source_dir"/ "$remote_target"
+  echo "⬆️ Uploading .m4a files..."
+  rsync -av --progress --include="*/" --include="*.m4a" --exclude="*" -- "$source_dir"/ "$remote_target"
 
   echo ""
   echo "🔐 Updating remote permissions..."
