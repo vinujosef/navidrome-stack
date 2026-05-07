@@ -72,6 +72,7 @@ The command asks which filename fix to run:
 
 ```text
 1. Dot-dash spacing: rename '01.-Song.m4a' to '01. Song.m4a'
+2. Disc-track prefix: rename '1.2. Song.flac' to '02. Song.flac'
 ```
 
 ### 3. audio-flac-to-m4a
@@ -177,7 +178,7 @@ and choose a destination category, files are uploaded to:
 
 #### Notes:
 
-- Uploads the contents of the current folder
+- Uploads only `.m4a` files from the current folder
 - Uses `rsync`, so repeated publishes only upload changed files
 - Creates the destination folder if missing
 - Uses the current folder name as the remote album/folder name
