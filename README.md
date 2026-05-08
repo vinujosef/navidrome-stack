@@ -99,7 +99,41 @@ audio-flac-to-m4a
 - Metadata and cover art are copied when ffmpeg can preserve them
 - A temporary `.m4a` is written first, then renamed after conversion succeeds
 
-### 4. audio-trim
+### 4. audio-album-fix
+Fix album grouping metadata for every `.m4a` file in the current folder.
+
+Use this when Navidrome splits one folder into multiple albums because the embedded tags still say the songs belong to different albums or years.
+
+#### Usage:
+
+```bash
+cd FolderName
+audio-album-fix
+```
+
+#### What it changes:
+
+- `album`
+- `album_artist`
+- clears `date/year`
+- clears `musicbrainz_albumid`
+- clears `albumversion`
+- clears `comment` / `description`
+- clears `discnumber`
+- `tracknumber`
+- capitalizes the first letter of `title` when needed
+- optional `artist`
+- optional `genre`
+
+#### What it keeps:
+
+- audio quality, without re-encoding
+- existing track titles, except first-letter capitalization
+- existing track artists, unless `--artist` is used
+- existing `compilation` / `TCMP` tags
+- existing cover art
+
+### 5. audio-trim
 Trim audio files using ffmpeg.
 
 #### Usage:
@@ -132,7 +166,7 @@ audio-trim \
 - +0.5 → reliable default
 - +0.7 / +0.9 → edge cases only
 
-### 5. audio-publish
+### 6. audio-publish
 Upload the current local folder to the Navidrome music folder on the server.
 
 #### Config:

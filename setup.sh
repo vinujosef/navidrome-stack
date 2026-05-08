@@ -44,11 +44,10 @@ remove_legacy_link() {
   fi
 }
 
-remove_legacy_link "audio-filename-fixing"
-
 link_script "$SCRIPT_DIR/audio-trim.sh" "audio-trim"
 link_script "$SCRIPT_DIR/audio-flac-to-m4a.sh" "audio-flac-to-m4a"
 link_script "$SCRIPT_DIR/audio-filename-fix.sh" "audio-filename-fix"
+link_script "$SCRIPT_DIR/audio-album-fix.sh" "audio-album-fix"
 link_script "$SCRIPT_DIR/audio-youtube-download.sh" "audio-youtube-download"
 link_script "$SCRIPT_DIR/audio-publish.sh" "audio-publish"
 
@@ -59,5 +58,6 @@ echo "You can now run:"
 echo "- audio-trim"
 echo "- audio-flac-to-m4a"
 echo "- audio-filename-fix"
+echo "- audio-album-fix"
 echo "- audio-youtube-download"
 echo "- audio-publish"
