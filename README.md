@@ -133,7 +133,35 @@ audio-album-fix
 - existing `compilation` / `TCMP` tags
 - existing cover art
 
-### 5. audio-trim
+### 5. audio-cover-art-fix
+Add or replace embedded cover art for `.m4a` files.
+
+#### Usage:
+
+```bash
+audio-cover-art-fix <cover-image.jpg|cover-image.png> [file1.m4a file2.m4a ...]
+```
+
+#### Examples:
+
+```bash
+cd album-folder
+audio-cover-art-fix cover.jpg
+audio-cover-art-fix cover.jpg "01. Song.m4a" "02. Song.m4a"
+```
+
+#### Notes:
+
+- Best input format is `.jpg` / `.jpeg`, ideally square
+- `.png` is also accepted
+- If no audio files are provided, every `.m4a` file in the current folder is updated
+- Existing embedded artwork is replaced with the provided image
+- Audio is copied without re-encoding
+- Existing metadata is preserved with `ffmpeg -map_metadata 0`
+- The `.m4a` container is rewritten while the artwork is replaced
+- Requires `ffmpeg`
+
+### 6. audio-trim
 Trim audio files using ffmpeg.
 
 #### Usage:
@@ -166,7 +194,7 @@ audio-trim \
 - +0.5 → reliable default
 - +0.7 / +0.9 → edge cases only
 
-### 6. audio-publish
+### 7. audio-publish
 Upload the current local folder to the Navidrome music folder on the server.
 
 #### Config:
