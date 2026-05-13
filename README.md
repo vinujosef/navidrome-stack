@@ -73,6 +73,7 @@ The command asks which filename fix to run:
 ```text
 1. Dot-dash spacing: rename '01.-Song.m4a' to '01. Song.m4a'
 2. Disc-track prefix: rename '1.2. Song.flac' to '02. Song.flac'
+3. SMR release name: rename '01-01-Artist-Song_Title-SMR.flac' to '01. Song Title.flac'
 ```
 
 ### 3. audio-flac-to-m4a
@@ -99,7 +100,7 @@ audio-flac-to-m4a
 - Metadata and cover art are copied when ffmpeg can preserve them
 - A temporary `.m4a` is written first, then renamed after conversion succeeds
 
-### 4. audio-album-fix
+### 4. audio-album-fix  `
 Fix album grouping metadata for every `.m4a` file in the current folder.
 
 Use this when Navidrome splits one folder into multiple albums because the embedded tags still say the songs belong to different albums or years.
