@@ -206,6 +206,7 @@ Create `.env` in the repo root:
 SERVER="<ssh-user>@<server-host>"
 DEST='<remote-music-folder>'
 CATEGORIES='<category-one>|<category-two>|<category-three>'
+METADATA_NAME_NORMALIZATIONS='old name=>canonical name|another old name=>another canonical name'
 ```
 
 #### Usage:
@@ -242,7 +243,47 @@ and choose a destination category, files are uploaded to:
 #### Notes:
 
 - Uploads only `.m4a` files from the current folder
+- Runs configured metadata name normalizations before upload
 - Uses `rsync`, so repeated publishes only upload changed files
 - Creates the destination folder if missing
 - Uses the current folder name as the remote album/folder name
 - Sets remote folder permissions after upload
+
+### 8. audio-metadata-normalize
+Normalize configured artist/composer metadata aliases for every `.m4a` file in the current folder.
+
+Use this when the same person appears under slightly different spellings in Navidrome artist or composer lists.
+
+#### Config:
+
+Add one or more private rules to `.env`:
+
+```bash
+METADATA_NAME_NORMALIZATIONS='old name=>canonical name|another old name=>another canonical name'
+```
+
+#### Usage:
+
+```bash
+audio-metadata-normalize
+audio-metadata-normalize --dry-run
+audio-metadata-normalize --yes
+```
+
+#### What it changes:
+
+- `artist`
+- `artists`
+- `album_artist`
+- `albumartist`
+- artist sort fields
+- album artist sort fields
+- `composer`
+- `composer_sort`
+
+#### Notes:
+
+- Rules are exact text replacements.
+- Audio is copied without re-encoding.
+- Existing metadata and cover art are preserved.
+- `audio-publish` automatically runs this first when `METADATA_NAME_NORMALIZATIONS` is configured.

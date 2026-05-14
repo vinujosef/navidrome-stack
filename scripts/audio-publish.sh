@@ -129,6 +129,16 @@ publish_folder() {
   echo "$SERVER:$remote_dir"
 }
 
+normalize_metadata_before_publish() {
+  if [ -z "${METADATA_NAME_NORMALIZATIONS:-}" ]; then
+    return
+  fi
+
+  echo ""
+  echo "🧹 Normalizing configured metadata aliases..."
+  "$SCRIPT_DIR/audio-metadata-normalize.sh" --yes
+}
+
 if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
   usage
   exit 0
@@ -154,4 +164,5 @@ fi
 choose_category
 remote_dir="$DEST/$selected_category/$folder_name"
 confirm_publish
+normalize_metadata_before_publish
 publish_folder
