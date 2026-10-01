@@ -74,6 +74,7 @@ The command asks which filename fix to run:
 1. Dot-dash spacing: rename '01.-Song.m4a' to '01. Song.m4a'
 2. Disc-track prefix: rename '1.2. Song.flac' to '02. Song.flac'
 3. SMR release name: rename '01-01-Artist-Song_Title-SMR.flac' to '01. Song Title.flac'
+4. Dash track separator: rename '01 - Song.m4a' to '01. Song.m4a'
 ```
 
 ### 3. audio-flac-to-m4a

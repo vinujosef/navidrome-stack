@@ -7,6 +7,7 @@ echo ""
 choice_dot_dash_spacing="1. Dot-dash spacing: rename '01.-Song.m4a' to '01. Song.m4a'"
 choice_disc_track_prefix="2. Disc-track prefix: rename '1.2. Song.flac' to '02. Song.flac'"
 choice_smr_release_name="3. SMR release name: rename '01-01-Artist-Song_Title-SMR.flac' to '01. Song Title.flac'"
+choice_dash_track_separator="4. Dash track separator: rename '01 - Song.m4a' to '01. Song.m4a'"
 
 usage() {
   echo "Usage:"
@@ -16,6 +17,7 @@ usage() {
   echo "  $choice_dot_dash_spacing"
   echo "  $choice_disc_track_prefix"
   echo "  $choice_smr_release_name"
+  echo "  $choice_dash_track_separator"
   echo ""
   echo "Options:"
   echo "  -h, --help   Show this help"
@@ -144,6 +146,40 @@ fix_smr_release_name() {
   fi
 }
 
+fix_dash_track_separator() {
+  local changed=0
+  local file
+  local filename
+  local track_number
+  local title
+  local new_name
+
+  for file in ./*; do
+    if [ ! -f "$file" ]; then
+      continue
+    fi
+
+    filename="${file#./}"
+
+    if [[ ! "$filename" =~ ^([0-9]+)\ -\ (.+)$ ]]; then
+      continue
+    fi
+
+    track_number="${BASH_REMATCH[1]}"
+    title="${BASH_REMATCH[2]}"
+    track_number="$(format_track_number "$track_number")"
+    new_name="./$track_number. $title"
+
+    if rename_file "$file" "$new_name"; then
+      changed=1
+    fi
+  done
+
+  if [ "$changed" -eq 0 ]; then
+    echo "No matching filenames found."
+  fi
+}
+
 run_choice() {
   local choice="$1"
 
@@ -156,6 +192,9 @@ run_choice() {
       ;;
     3)
       fix_smr_release_name
+      ;;
+    4)
+      fix_dash_track_separator
       ;;
     *)
       echo "❌ Unknown option: $choice"
@@ -171,6 +210,7 @@ choose_option() {
   echo "$choice_dot_dash_spacing"
   echo "$choice_disc_track_prefix"
   echo "$choice_smr_release_name"
+  echo "$choice_dash_track_separator"
   echo ""
   read -r -p "Enter option: " choice
 
