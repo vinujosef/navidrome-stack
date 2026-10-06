@@ -101,6 +101,26 @@ audio-flac-to-m4a
 - Metadata and cover art are copied when ffmpeg can preserve them
 - A temporary `.m4a` is written first, then renamed after conversion succeeds
 
+### audio-alac-to-aac
+
+Check M4A files and convert only ALAC lossless audio to AAC at 192 kbps.
+
+```bash
+audio-alac-to-aac                  # All M4A files in the current folder
+audio-alac-to-aac "01. Song.m4a"    # One song (or provide multiple files)
+```
+
+- Keeps the same filename in an `aac-192` subfolder beside each input.
+- Preserves the original files and skips existing outputs.
+- Skips AAC and other non-ALAC audio without re-encoding.
+- Copies metadata and cover art; artwork retains its original size.
+- Does not scan subfolders. Requires `ffmpeg` and `ffprobe`.
+- Writes a temporary file first and publishes it only after conversion succeeds.
+- Continues after individual file errors and prints a final summary of converted,
+  skipped, and failed files, including failure reasons. Returns a nonzero exit code
+  if any file failed.
+- Run `bash setup.sh` to install the command link after adding this script.
+
 ### 4. audio-album-fix  `
 Fix album grouping metadata for every `.m4a` file in the current folder.
 
