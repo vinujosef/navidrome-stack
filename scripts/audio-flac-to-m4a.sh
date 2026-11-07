@@ -8,7 +8,7 @@ usage() {
   echo "Usage:"
   echo "audio-flac-to-m4a"
   echo ""
-  echo "Converts every .flac file in the current folder to .m4a at 160k."
+  echo "Converts every .flac file in the current folder to .m4a at 256k."
 }
 
 require_command() {
@@ -61,7 +61,7 @@ convert_one_file() {
   echo "▶️ Converting:"
   echo "- Input:   $input"
   echo "- Output:  $output"
-  echo "- Bitrate: 160k"
+  echo "- Bitrate: 256k"
   echo ""
 
   if ! ffmpeg \
@@ -71,7 +71,7 @@ convert_one_file() {
     -map "0:v?" \
     -map_metadata 0 \
     -c:a aac \
-    -b:a 160k \
+    -b:a 256k \
     -c:v copy \
     -disposition:v attached_pic \
     "$temp_output"; then
@@ -86,7 +86,7 @@ convert_one_file() {
       -map_metadata 0 \
       -vn \
       -c:a aac \
-      -b:a 160k \
+      -b:a 256k \
       "$temp_output"
   fi
 
@@ -117,7 +117,7 @@ fi
 
 echo "▶️ Conversion plan:"
 echo "- Format:  m4a AAC"
-echo "- Bitrate: 160k"
+echo "- Bitrate: 256k"
 echo "- Folder:  $(pwd)"
 echo "- Existing files: skip"
 echo ""

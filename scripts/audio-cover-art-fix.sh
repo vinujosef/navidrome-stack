@@ -1,15 +1,24 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+  SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+  [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
 echo "🎧 Navidrome - Add Cover Art"
 echo ""
 
 usage() {
   echo "Usage:"
-  echo "audio-cover-art-fix <cover-image.jpg|cover-image.png> [file1.m4a file2.m4a ...]"
+  echo "audio-cover-art-fix <cover-image.jpg|cover-image.png> [file1.m4a file2.opus ...]"
   echo ""
-  echo "If no .m4a files are provided, every .m4a file in the current folder is updated."
+  echo "If no audio files are provided, every .m4a or .opus file in the current folder is updated."
   echo "Existing embedded artwork is replaced. Audio is copied without re-encoding."
+  echo "Requires ffmpeg; Opus artwork also requires ffprobe and python3."
 }
 
 fix_one_file() {
@@ -21,12 +30,16 @@ fix_one_file() {
     return 1
   fi
 
-  if [[ ! "$input" =~ \.[mM]4[aA]$ ]]; then
-    echo "⚠️ Skipping non-M4A file: $input"
+  if [[ ! "$input" =~ \.([mM]4[aA]|[oO][pP][uU][sS])$ ]]; then
+    echo "⚠️ Skipping unsupported file: $input"
     return 0
   fi
 
   echo "Updating: ${input#./}"
+  if [[ "$input" =~ \.[oO][pP][uU][sS]$ ]]; then
+    python3 "$SCRIPT_DIR/lib/opus-metadata.py" "$input" --cover "$cover_image"
+    return
+  fi
 
   temp_output="$(dirname "$input")/.${input##*/}.cover.tmp.$$.m4a"
 
@@ -87,16 +100,23 @@ esac
 
 if [ "$#" -eq 0 ]; then
   shopt -s nullglob nocaseglob
-  audio_files=(*.m4a)
+  audio_files=(./*.m4a ./*.opus)
   shopt -u nocaseglob
 else
   audio_files=("$@")
 fi
 
 if [ "${#audio_files[@]}" -eq 0 ]; then
-  echo "⚠️ No .m4a files found."
+  echo "⚠️ No .m4a or .opus files found."
   exit 0
 fi
+
+for audio_file in "${audio_files[@]}"; do
+  if [[ "$audio_file" =~ \.[oO][pP][uU][sS]$ ]] && ! command -v python3 >/dev/null 2>&1; then
+    echo 'Missing required command for Opus artwork: python3' >&2
+    exit 1
+  fi
+done
 
 echo "▶️ Cover art plan:"
 echo "- Cover:  $cover_image"

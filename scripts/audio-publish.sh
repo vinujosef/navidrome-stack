@@ -22,6 +22,8 @@ usage() {
   echo "audio-publish"
   echo ""
   echo "Run this command from the local folder you want to upload."
+  echo "Uploads M4A and Opus files, including subfolders."
+  echo "Configured metadata normalization processes only the current folder."
 }
 
 shell_quote() {
@@ -117,8 +119,8 @@ publish_folder() {
   ssh "$SERVER" "mkdir -p -- $quoted_remote_dir && chmod 755 -- $quoted_remote_dir"
 
   echo ""
-  echo "⬆️ Uploading .m4a files..."
-  rsync -av --progress --include="*/" --include="*.m4a" --exclude="*" -- "$source_dir"/ "$remote_target"
+  echo "⬆️ Uploading .m4a and .opus files..."
+  rsync -av --progress --include="*/" --include="*.[mM]4[aA]" --include="*.[oO][pP][uU][sS]" --exclude="*" -- "$source_dir"/ "$remote_target"
 
   echo ""
   echo "🔐 Updating remote permissions..."

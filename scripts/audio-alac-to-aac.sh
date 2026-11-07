@@ -4,8 +4,8 @@ set -euo pipefail
 usage() {
   echo 'Usage: audio-alac-to-aac [file.m4a ...]'
   echo 'With no arguments, checks every .m4a file in the current folder.'
-  echo 'Converts only ALAC audio to AAC at 192 kbps.'
-  echo 'Keeps filenames, tags, and artwork in an aac-192 subfolder beside each input.'
+  echo 'Converts only ALAC audio to AAC at 256 kbps.'
+  echo 'Keeps filenames, tags, and artwork in an aac-256 subfolder beside each input.'
   echo 'Originals are preserved; existing outputs are skipped.'
 }
 
@@ -67,7 +67,7 @@ convert_one_file() {
     return 0
   fi
 
-  output_dir="$(dirname "$input")/aac-192"
+  output_dir="$(dirname "$input")/aac-256"
   output="$output_dir/$(basename "$input")"
   if [ -e "$output" ] || [ -L "$output" ]; then
     echo "Skipping existing output: $output"
@@ -81,10 +81,10 @@ convert_one_file() {
     failure_reason='Could not create temporary file'
     return 1
   fi
-  echo "Converting to AAC 192 kbps: $input"
+  echo "Converting to AAC 256 kbps: $input"
   if ! ffmpeg -hide_banner -loglevel error -nostdin -y -i "$input" \
     -map 0:a:0 -map '0:v?' -map_metadata 0 \
-    -c:a aac -b:a 192k -c:v copy -disposition:v attached_pic \
+    -c:a aac -b:a 256k -c:v copy -disposition:v attached_pic \
     -f ipod "$temp_output"; then
     failure_reason='AAC conversion failed'
     return 1

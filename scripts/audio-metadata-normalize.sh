@@ -37,7 +37,8 @@ usage() {
   echo "Usage:"
   echo "audio-metadata-normalize [--yes] [--dry-run]"
   echo ""
-  echo "Normalizes configured artist/composer metadata aliases for every .m4a file in the current folder."
+  echo "Normalizes configured artist/composer metadata aliases for every .m4a or .opus file in the current folder."
+  echo "Requires ffmpeg and ffprobe; Opus updates also require python3."
   echo ""
   echo "Config:"
   echo "Add rules to repo .env:"
@@ -119,13 +120,20 @@ parse_normalization_rules() {
   done
 }
 
-load_m4a_files() {
+load_audio_files() {
   shopt -s nullglob nocaseglob
-  m4a_files=(*.m4a)
+  audio_files=(./*.m4a ./*.opus)
   shopt -u nocaseglob
 
-  if [ "${#m4a_files[@]}" -eq 0 ]; then
-    echo "⚠️ No .m4a files found in current folder."
+  for audio_file in "${audio_files[@]}"; do
+    if [[ "$audio_file" =~ \.[oO][pP][uU][sS]$ ]]; then
+      require_command python3
+      break
+    fi
+  done
+
+  if [ "${#audio_files[@]}" -eq 0 ]; then
+    echo "⚠️ No .m4a or .opus files found in current folder."
     exit 0
   fi
 }
@@ -137,7 +145,7 @@ metadata_value() {
 
   value="$(ffprobe \
     -v error \
-    -show_entries "format_tags=$tag_name" \
+    -show_entries "format_tags=$tag_name:stream_tags=$tag_name" \
     -of default=noprint_wrappers=1:nokey=1 \
     "$input" || true)"
 
@@ -190,18 +198,18 @@ scan_all_files() {
   files_to_update=()
   all_change_lines=()
 
-  local m4a_file
+  local audio_file
   local line
 
-  for m4a_file in "${m4a_files[@]}"; do
-    scan_file "$m4a_file"
+  for audio_file in "${audio_files[@]}"; do
+    scan_file "$audio_file"
 
     if [ "${#file_metadata_args[@]}" -eq 0 ]; then
       continue
     fi
 
-    files_to_update+=("$m4a_file")
-    all_change_lines+=("${m4a_file#./}")
+    files_to_update+=("$audio_file")
+    all_change_lines+=("${audio_file#./}")
 
     for line in "${file_change_lines[@]}"; do
       all_change_lines+=("$line")
@@ -214,7 +222,7 @@ print_plan() {
 
   echo "▶️ Metadata normalization plan:"
   echo "- Folder:       $(pwd)"
-  echo "- Files scanned: ${#m4a_files[@]}"
+  echo "- Files scanned: ${#audio_files[@]}"
   echo "- Files to fix:  ${#files_to_update[@]}"
   echo ""
 
@@ -264,6 +272,11 @@ fix_one_file() {
 
   echo "Updating: ${input#./}"
 
+  if [[ "$input" =~ \.[oO][pP][uU][sS]$ ]]; then
+    python3 "$SCRIPT_DIR/lib/opus-metadata.py" "$input" "${file_metadata_args[@]}"
+    return
+  fi
+
   ffmpeg \
     -hide_banner \
     -loglevel error \
@@ -295,7 +308,7 @@ if [ "${#normalization_rules[@]}" -eq 0 ]; then
   exit 0
 fi
 
-load_m4a_files
+load_audio_files
 scan_all_files
 print_plan
 confirm_rewrite
@@ -305,8 +318,8 @@ if [ "$dry_run" -eq 1 ]; then
   exit 0
 fi
 
-for m4a_file in "${files_to_update[@]}"; do
-  fix_one_file "$m4a_file"
+for audio_file in "${files_to_update[@]}"; do
+  fix_one_file "$audio_file"
 done
 
 echo ""

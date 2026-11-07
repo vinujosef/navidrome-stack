@@ -87,8 +87,8 @@ trim_one_file() {
   echo ""
 
   # -map 0:a:0 selects the first audio stream, and -vn ignores embedded artwork/video.
-  # Re-encoding to AAC at 160k gives cleaner cuts while keeping file size controlled.
-  ffmpeg -y -ss "$start" -to "$end" -i "$input" -map 0:a:0 -vn -c:a aac -b:a 160k "$output"
+  # Re-encoding to AAC at 192k gives cleaner cuts while keeping file size controlled.
+  ffmpeg -y -ss "$start" -to "$end" -i "$input" -map 0:a:0 -vn -c:a aac -b:a 192k "$output"
 
   echo "✅ Done: $output"
   echo ""

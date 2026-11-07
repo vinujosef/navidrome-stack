@@ -1,8 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_PATH" ]; do
+  SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+  [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
 # Navidrome groups albums from embedded metadata, not from folder names.
-# This command makes every .m4a in the current folder share one album identity.
+# This command gives M4A and Opus files in the current folder one album identity.
 
 echo "🎧 Navidrome - Audio Album Fix"
 echo ""
@@ -17,7 +25,7 @@ usage() {
   echo "audio-album-fix"
   echo "audio-album-fix [--album <name>] [--artist <name>] [--genre <name>]"
   echo ""
-  echo "Fixes album grouping metadata for every .m4a file in the current folder."
+  echo "Fixes album grouping metadata for every .m4a or .opus file in the current folder."
   echo "If --album is omitted, the current folder name is used as the album name."
   echo "If the folder is named '<artist> - <album>', the album artist is inferred from the text before '-'."
   echo "Track artist tags are kept as-is unless --artist is used."
@@ -26,6 +34,7 @@ usage() {
   echo "Title starts with a capital letter when it starts with an alphabetic character."
   echo "Disc number tags are cleared."
   echo "Comment tags are cleared."
+  echo "Requires ffmpeg and ffprobe; Opus updates also require python3."
   echo ""
   echo "Typical Navidrome fix:"
   echo 'cd "Taylor Swift - Greatest Hits"'
@@ -48,7 +57,7 @@ metadata_value() {
 
   value="$(ffprobe \
     -v error \
-    -show_entries "format_tags=$tag_name" \
+    -show_entries "format_tags=$tag_name:stream_tags=$tag_name" \
     -of default=noprint_wrappers=1:nokey=1 \
     "$input" || true)"
 
@@ -168,18 +177,18 @@ track_number_from_filename() {
 
 # Fail before the confirmation prompt if any file cannot be numbered.
 validate_track_number_prefixes() {
-  local m4a_file
+  local audio_file
   local missing_count
 
   missing_count=0
 
-  for m4a_file in "${m4a_files[@]}"; do
-    if [ -z "$(track_number_from_filename "$m4a_file")" ]; then
+  for audio_file in "${audio_files[@]}"; do
+    if [ -z "$(track_number_from_filename "$audio_file")" ]; then
       if [ "$missing_count" -eq 0 ]; then
         echo "❌ Could not infer track numbers from these filenames:"
       fi
 
-      echo "  - ${m4a_file#./}"
+      echo "  - ${audio_file#./}"
       missing_count=$((missing_count + 1))
     fi
   done
@@ -247,6 +256,11 @@ fix_one_file() {
 
   echo "Updating: ${input#./}"
 
+  if [[ "$input" =~ \.[oO][pP][uU][sS]$ ]]; then
+    python3 "$SCRIPT_DIR/lib/opus-metadata.py" "$input" "${file_metadata_args[@]}"
+    return
+  fi
+
   ffmpeg \
     -hide_banner \
     -loglevel error \
@@ -276,13 +290,20 @@ plan_value() {
   fi
 }
 
-load_m4a_files() {
+load_audio_files() {
   shopt -s nullglob nocaseglob
-  m4a_files=(*.m4a)
+  audio_files=(./*.m4a ./*.opus)
   shopt -u nocaseglob
 
-  if [ "${#m4a_files[@]}" -eq 0 ]; then
-    echo "⚠️ No .m4a files found in current folder."
+  for audio_file in "${audio_files[@]}"; do
+    if [[ "$audio_file" =~ \.[oO][pP][uU][sS]$ ]]; then
+      require_command python3
+      break
+    fi
+  done
+
+  if [ "${#audio_files[@]}" -eq 0 ]; then
+    echo "⚠️ No .m4a or .opus files found in current folder."
     exit 0
   fi
 }
@@ -291,7 +312,7 @@ print_plan() {
   echo ""
   echo "▶️ Album fix plan:"
   echo "- Folder:       $(pwd)"
-  echo "- Files:        ${#m4a_files[@]}"
+  echo "- Files:        ${#audio_files[@]}"
   echo "- Album:        $album"
   echo "- Album artist: $album_artist"
   echo "- Date/year:    clear"
@@ -331,13 +352,13 @@ parse_args "$@"
 prompt_for_missing_values
 validate_required_values
 build_metadata_args
-load_m4a_files
+load_audio_files
 validate_track_number_prefixes
 print_plan
 confirm_rewrite
 
-for m4a_file in "${m4a_files[@]}"; do
-  fix_one_file "$m4a_file"
+for audio_file in "${audio_files[@]}"; do
+  fix_one_file "$audio_file"
 done
 
 echo ""
