@@ -100,6 +100,27 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(tags(path)['artist'], 'New Artist')
             self.assertEqual(audio_hash(path), self.original_audio[path])
 
+    def test_normalize_without_custom_rules(self):
+        for config in ('', "METADATA_NAME_NORMALIZATIONS=''\n"):
+            with self.subTest(config=config):
+                (self.repo / '.env').write_text(config)
+                env = dict(os.environ)
+                env.pop('METADATA_NAME_NORMALIZATIONS', None)
+                for path in self.paths:
+                    run(['ffmpeg', '-v', 'error', '-y', '-i', str(path),
+                         '-c', 'copy', '-metadata', 'artist=AR Rahman',
+                         '-metadata:s:a:0', 'artist=AR Rahman',
+                         str(path.with_name('temp' + path.suffix))])
+                    path.with_name('temp' + path.suffix).replace(path)
+                result = self.script('audio-metadata-normalize.sh', '--yes', env=env)
+                self.assertIn('artist: AR Rahman -> A. R. Rahman', result.stdout)
+                for path in self.paths:
+                    self.assertEqual(tags(path)['artist'], 'A. R. Rahman')
+                    self.assertEqual(audio_hash(path), self.original_audio[path])
+                result = self.script('audio-metadata-normalize.sh', '--yes', env=env)
+                self.assertIn('Files to fix:  0', result.stdout)
+                self.assertIn('Metadata normalization complete', result.stdout)
+
     def test_publish_filters_include_opus(self):
         bindir = self.root / 'bin'
         bindir.mkdir()

@@ -107,7 +107,7 @@ parse_normalization_rules() {
 
   IFS="|" read -r -a normalization_rules <<< "$raw_rules"
 
-  for rule in "${normalization_rules[@]}"; do
+  for rule in ${normalization_rules[@]+"${normalization_rules[@]}"}; do
     if [[ "$rule" != *"=>"* ]]; then
       echo "❌ Invalid normalization rule: $rule"
       echo "Expected format: old name=>canonical name"
@@ -130,7 +130,7 @@ load_audio_files() {
   audio_files=(./*.m4a ./*.opus)
   shopt -u nocaseglob
 
-  for audio_file in "${audio_files[@]}"; do
+  for audio_file in ${audio_files[@]+"${audio_files[@]}"}; do
     if [[ "$audio_file" =~ \.[oO][pP][uU][sS]$ ]]; then
       require_command python3
       break
@@ -163,7 +163,7 @@ normalize_value() {
   local from
   local to
 
-  for rule in "${normalization_rules[@]}"; do
+  for rule in ${normalization_rules[@]+"${normalization_rules[@]}"}; do
     from="${rule%%=>*}"
     to="${rule#*=>}"
     value="${value//$from/$to}"
@@ -206,7 +206,7 @@ scan_all_files() {
   local audio_file
   local line
 
-  for audio_file in "${audio_files[@]}"; do
+  for audio_file in ${audio_files[@]+"${audio_files[@]}"}; do
     scan_file "$audio_file"
 
     if [ "${#file_metadata_args[@]}" -eq 0 ]; then
@@ -319,7 +319,7 @@ if [ "$dry_run" -eq 1 ]; then
   exit 0
 fi
 
-for audio_file in "${files_to_update[@]}"; do
+for audio_file in ${files_to_update[@]+"${files_to_update[@]}"}; do
   fix_one_file "$audio_file"
 done
 
