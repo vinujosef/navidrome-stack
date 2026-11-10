@@ -7,6 +7,10 @@ Focus:
 - repeatable commands
 - zero manual mistakes
 
+## Library conventions
+
+- **Date** and **Original Release Date** always refer to the movie release date in this library.
+
 ## ⚙️ Setup
 
 ### 1. Why setup is needed:
