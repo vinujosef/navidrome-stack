@@ -78,8 +78,10 @@ class WorkflowTests(unittest.TestCase):
         self.script('audio-cover-art-fix.sh', str(self.cover))
         artwork = {p: self.assert_art(p) for p in self.paths}
         self.script('audio-album-fix.sh', input='y\n')
-        self.script('audio-metadata-normalize.sh', '--yes')
+        result = self.script('audio-metadata-normalize.sh', '--yes')
+        self.assertIn('artist: Old Artist -> New Artist', result.stdout)
         for path in self.paths:
+            self.assertIn(path.name, result.stdout)
             metadata = tags(path)
             self.assertEqual(metadata['title'], 'Test song')
             self.assertEqual(metadata['artist'], 'New Artist')

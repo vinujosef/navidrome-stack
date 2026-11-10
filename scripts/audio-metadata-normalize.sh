@@ -23,10 +23,15 @@ metadata_tags=(
   artists
   album_artist
   albumartist
+  album_artists
+  albumartists
+  "album artists"
   artist_sort
   artists_sort
   album_artist_sort
   albumartist_sort
+  album_artists_sort
+  albumartists_sort
   sort_artist
   sort_album_artist
   composer
@@ -38,7 +43,7 @@ usage() {
   echo "audio-metadata-normalize [--yes] [--dry-run]"
   echo ""
   echo "Normalizes configured artist/composer metadata aliases for every .m4a or .opus file in the current folder."
-  echo "Requires ffmpeg and ffprobe; Opus updates also require python3."
+  echo "Requires ffmpeg, ffprobe, and python3."
   echo ""
   echo "Config:"
   echo "Add rules to repo .env:"
@@ -164,7 +169,7 @@ normalize_value() {
     value="${value//$from/$to}"
   done
 
-  printf "%s" "$value"
+  printf "%s" "$value" | python3 "$SCRIPT_DIR/lib/normalize-names.py"
 }
 
 scan_file() {
@@ -297,16 +302,12 @@ cleanup_temp_files() {
 
 require_command ffmpeg
 require_command ffprobe
+require_command python3
 trap cleanup_temp_files EXIT
 
 parse_args "$@"
 load_env
 parse_normalization_rules
-
-if [ "${#normalization_rules[@]}" -eq 0 ]; then
-  echo "No metadata normalization rules configured."
-  exit 0
-fi
 
 load_audio_files
 scan_all_files

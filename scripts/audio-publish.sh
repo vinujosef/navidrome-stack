@@ -132,12 +132,8 @@ publish_folder() {
 }
 
 normalize_metadata_before_publish() {
-  if [ -z "${METADATA_NAME_NORMALIZATIONS:-}" ]; then
-    return
-  fi
-
   echo ""
-  echo "🧹 Normalizing configured metadata aliases..."
+  echo "🧹 Normalizing metadata names..."
   "$SCRIPT_DIR/audio-metadata-normalize.sh" --yes
 }
 

@@ -319,12 +319,12 @@ and choose a destination category, files are uploaded to:
 #### Notes:
 
 - Uploads only `.m4a` and `.opus` files from the current folder and its subfolders (case-insensitive extensions)
-- Runs configured metadata name normalizations on the current folder before upload; nested folders are uploaded but their tags are not normalized
+- Runs built-in and configured metadata name normalizations on the current folder before upload; nested folders are uploaded but their tags are not normalized
 - Uses `rsync`, so repeated publishes only upload changed files
 - Creates the destination folder if missing
 - Uses the current folder name as the remote album/folder name
 - Sets remote folder permissions after upload
-- Requires `ssh` and `rsync`; configured metadata normalization also requires `ffmpeg`, `ffprobe`, and `python3` for Opus
+- Requires `ssh` and `rsync`; metadata normalization also requires `ffmpeg`, `ffprobe`, and `python3`
 
 ### 8. audio-metadata-normalize
 Normalize configured artist/composer metadata aliases for every `.m4a` or `.opus` file in the current folder.
@@ -353,6 +353,7 @@ audio-metadata-normalize --yes
 - `artists`
 - `album_artist`
 - `albumartist`
+- `album_artists`, `albumartists`, and `album artists`
 - artist sort fields
 - album artist sort fields
 - `composer`
@@ -360,12 +361,19 @@ audio-metadata-normalize --yes
 
 #### Notes:
 
-- Rules are case-sensitive text replacements, including matching text within a tag value.
+- Built-in normalization always converts A. R. Rahman variants (such as `A.R.RAHMAN`, `a r rahman`, and `ARRahman`) to `A. R. Rahman`, ignoring case, spacing, and periods between initials. It also works within multi-artist values.
+- Also normalizes `Neha S.Nair` / `Neha Nair` / `NehaS. Nair` to `Neha S. Nair`, `K.S.Chitra` / `K.S.Chithra` to `K. S. Chithra`, and `K.J.Yesudas` to `K. J. Yesudas`, ignoring capitalization and variations in spacing and periods.
+- The normalization plan prints each changed file and metadata field with its before and after values, including when run by `audio-publish`.
+- Also normalizes `G.V. Prakash` / `G. V. Prakas Kumar` to `G. V. Prakash Kumar`, `SidSriram` / `SID SRIAM` / `Sid Shriram` to `Sid Sriram`, and `S.P.Balasubrahmanyam` / `S. P. Balasubramanyam` to `S. P. Balasubrahmanyam`, with the same capitalization and separator handling.
+- Also normalizes capitalization, spacing, and period variants of `K. G. Markose`, `M. G. Radhakrishnan`, `K. S. Harisankar`, and `Nikhita Gandhi` to those canonical names.
+- Also normalizes capitalization, spacing, and period variants of `M. G. Sreekumar` and `Yuvan Shankar Raja` to those canonical names.
+- Also normalizes capitalization, spacing, and period variants of `Sam C. S.` (such as `SamCS` and `SAM C.S`) to `Sam C. S.`.
+- Additional configured rules are case-sensitive text replacements, including matching text within a tag value.
 - Processes only the current folder, with case-insensitive `.m4a` and `.opus` extensions.
-- Requires `ffmpeg` and `ffprobe`, plus `python3` for Opus.
+- Requires `ffmpeg`, `ffprobe`, and `python3`.
 - Audio is copied without re-encoding.
 - Existing metadata and cover art are preserved.
-- `audio-publish` automatically runs this first when `METADATA_NAME_NORMALIZATIONS` is configured.
+- `audio-publish` automatically runs this first, including when no extra rules are configured.
 
 
 ### 9. audio-backup
