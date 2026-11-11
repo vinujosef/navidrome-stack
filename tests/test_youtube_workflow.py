@@ -74,6 +74,56 @@ class WorkflowTests(unittest.TestCase):
                                         '-map', f"0:{images[0]['index']}", '-c', 'copy',
                                         '-f', 'image2pipe', '-'])
 
+    def test_trim_source_bitrate_and_cap(self):
+        for target in (96000, 224000, 320000):
+            with self.subTest(target=target):
+                source = self.album / f'source {target}.m4a'
+                output = self.album / f'trimmed {target}.m4a'
+                run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i',
+                     'anoisesrc=duration=3:sample_rate=48000:seed=42',
+                     '-ac', '2', '-c:a', 'aac', '-b:a', str(target), str(source)])
+                original = audio_hash(source)
+                source_rate = int(probe(source)['streams'][0]['bit_rate'])
+                expected = min(source_rate, 256000)
+                result = self.script('audio-trim.sh', str(source), '00:00',
+                                     '00:02', str(output))
+                self.assertIn(
+                    f'Source audio bitrate: {source_rate / 1000:.3f} kbps ({source_rate} bps)',
+                    result.stdout)
+                self.assertIn(
+                    f'Trimmed file AAC target bitrate: {expected / 1000:.3f} kbps ({expected} bps)',
+                    result.stdout)
+                info = probe(output)
+                self.assertEqual(info['streams'][0]['codec_name'], 'aac')
+                self.assertAlmostEqual(float(info['format']['duration']), 2, delta=0.1)
+                self.assertLess(int(info['streams'][0]['bit_rate']), expected * 1.15)
+                self.assertEqual(audio_hash(source), original)
+
+    def test_trim_unknown_bitrate_and_failed_overwrite(self):
+        source = self.album / 'unknown bitrate.wav'
+        output = self.album / 'existing output.m4a'
+        run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'sine=duration=2',
+             str(source)])
+        # Simulate a codec/container that does not report a stream bitrate.
+        bindir = self.root / 'probe-bin'
+        bindir.mkdir()
+        fake_probe = bindir / 'ffprobe'
+        fake_probe.write_text('#!/bin/sh\necho N/A\n')
+        fake_probe.chmod(0o755)
+        env = dict(os.environ, PATH=str(bindir) + ':' + os.environ['PATH'])
+        result = self.script('audio-trim.sh', str(source), '00:00', '00:01',
+                             str(output), env=env)
+        self.assertIn('Source audio bitrate unavailable; using 256 kbps', result.stdout)
+        self.assertIn('Source audio bitrate: unavailable', result.stdout)
+        self.assertIn('Trimmed file AAC target bitrate: 256.000 kbps (256000 bps)',
+                      result.stdout)
+        original = output.read_bytes()
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.script('audio-trim.sh', str(source), '00:02', '00:01',
+                        str(output), env=env)
+        self.assertEqual(output.read_bytes(), original)
+        self.assertEqual(list(self.album.glob('.audio-trim.*')), [])
+
     def test_tags_artwork_and_audio_preservation(self):
         self.script('audio-cover-art-fix.sh', str(self.cover))
         artwork = {p: self.assert_art(p) for p in self.paths}

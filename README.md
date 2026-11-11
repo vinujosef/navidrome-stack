@@ -23,7 +23,7 @@ Ensure `~/bin` is in your `PATH`. Commands then work from any album folder.
 | [`audio-alac-to-aac`](docs/commands.md#audio-alac-to-aac) | Convert ALAC to AAC at 256 kbps; keep originals |
 | [`audio-album-fix`](docs/commands.md#audio-album-fix) | Fix album grouping and track tags |
 | [`audio-cover-art-fix`](docs/commands.md#audio-cover-art-fix) | Replace embedded artwork |
-| [`audio-trim`](docs/commands.md#audio-trim) | Trim to AAC at 192 kbps; overwrites existing output |
+| [`audio-trim`](docs/commands.md#audio-trim) | Trim to AAC at source bitrate, capped at 256 kbps; overwrites existing output |
 | [`audio-metadata-normalize`](docs/commands.md#audio-metadata-normalize) | Normalize artist and composer names |
 | [`audio-publish`](docs/commands.md#audio-publish) | Upload M4A/Opus files to your server |
 

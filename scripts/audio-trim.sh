@@ -4,8 +4,8 @@ set -euo pipefail
 echo "🎧 Navidrome - Audio Trim"
 echo ""
 
-if ! command -v ffmpeg >/dev/null 2>&1; then
-  echo "❌ ffmpeg is not installed or not available in PATH."
+if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
+  echo "❌ ffmpeg and ffprobe must be installed and available in PATH."
   exit 1
 fi
 
@@ -50,11 +50,14 @@ normalize_output() {
   fi
 }
 
-trim_one_file() {
+trim_one_file() (
   local input="$1"
   local start="$2"
   local end="$3"
   local output="$4"
+  local source_bitrate
+  local bitrate=256000
+  local temp_output
 
   if [ ! -f "$input" ]; then
     echo "❌ File not found: $input"
@@ -75,24 +78,47 @@ trim_one_file() {
   end="$(normalize_time "$end")"
   output="$(normalize_output "$output")"
 
+  source_bitrate="$(ffprobe -v error -select_streams a:0 \
+    -show_entries stream=bit_rate -of default=noprint_wrappers=1:nokey=1 "$input")"
+  if [[ "$source_bitrate" =~ ^[0-9]+$ ]] && [ "$source_bitrate" -gt 0 ]; then
+    if [ "$source_bitrate" -lt "$bitrate" ]; then
+      bitrate="$source_bitrate"
+    fi
+  else
+    source_bitrate="unavailable"
+    echo "⚠️ Source audio bitrate unavailable; using 256 kbps."
+  fi
+
   if [ -f "$output" ]; then
     echo "⚠️ Overwriting existing file: $output"
   fi
 
-  echo "▶️ Trimming:"
+  echo "▶️  Trimming:"
   echo "- Input:  $input"
   echo "- Output: $output"
   echo "- Start:  $start"
   echo "- End:    $end"
+  if [ "$source_bitrate" = "unavailable" ]; then
+    echo "- Source audio bitrate: unavailable"
+  else
+    printf -- '- Source audio bitrate: %d.%03d kbps (%s bps)\n' \
+      "$((source_bitrate / 1000))" "$((source_bitrate % 1000))" "$source_bitrate"
+  fi
+  printf -- '- Trimmed file AAC target bitrate: %d.%03d kbps (%s bps)\n' \
+    "$((bitrate / 1000))" "$((bitrate % 1000))" "$bitrate"
   echo ""
 
   # -map 0:a:0 selects the first audio stream, and -vn ignores embedded artwork/video.
-  # Re-encoding to AAC at 192k gives cleaner cuts while keeping file size controlled.
-  ffmpeg -y -ss "$start" -to "$end" -i "$input" -map 0:a:0 -vn -c:a aac -b:a 192k "$output"
+  # Cap the AAC target at the source audio bitrate when it is available.
+  temp_output="$(mktemp "$(dirname "$output")/.audio-trim.XXXXXX")"
+  trap 'rm -f "$temp_output"' EXIT
+  ffmpeg -y -ss "$start" -to "$end" -i "$input" -map 0:a:0 -vn \
+    -c:a aac -b:a "$bitrate" -f ipod "$temp_output"
+  mv -f "$temp_output" "$output"
 
   echo "✅ Done: $output"
   echo ""
-}
+)
 
 usage() {
   echo "Usage:"

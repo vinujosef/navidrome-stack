@@ -11,7 +11,7 @@ Date and Original Release Date refer to the movie release date in this library.
 | FLAC conversion | AAC in `.m4a`, target 256 kbps; original retained |
 | ALAC conversion | AAC in `.m4a`, target 256 kbps, in `aac-256`; original retained |
 | YouTube download | Source audio without re-encoding; usually `.opus` or `.m4a` |
-| Trimming | AAC in `.m4a`, target 192 kbps |
+| Trimming | AAC in `.m4a`, source bitrate capped at 256 kbps |
 
 AAC bitrates are encoder targets; measured values can vary slightly.
 
@@ -113,7 +113,7 @@ audio-cover-art-fix cover.jpg "01. Song.m4a" "02. Song.opus"
 
 ## audio-trim
 
-Trim audio to AAC in an M4A file at 192 kbps.
+Trim audio to AAC in an M4A file using the source audio bitrate, capped at 256 kbps.
 
 ```bash
 # Input, start, end, output:
@@ -124,8 +124,9 @@ audio-trim song1.m4a 00:11 03:00 intro1.m4a song2.opus 00:05 02:30 intro2.m4a
 
 - Accepts `MM:SS` or `HH:MM:SS` timestamps.
 - Re-encodes audio, including Opus input; omits artwork.
-- Overwrites existing output files. Paths are relative to the current folder.
-- Requires `ffmpeg`.
+- Uses 256 kbps with a warning if the source audio bitrate is unavailable. The target is an average bitrate; actual bitrate and file size can vary.
+- Overwrites existing output files only after encoding succeeds. Paths are relative to the current folder.
+- Requires `ffmpeg` and `ffprobe`.
 
 ## audio-publish
 
