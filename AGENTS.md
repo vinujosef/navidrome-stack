@@ -12,9 +12,14 @@ This repository contains command-line tools for preparing audio for Navidrome.
 
 ## Repository map
 
-- `scripts/audio-*.sh`: user-facing Bash commands.
+- `scripts/navidrome-tools.sh`: installed interactive menu; runs one action, then exits
+  with that command’s status. Cancellation exits without running an action.
+- `scripts/audio-*.sh`: underlying Bash commands invoked by the menu.
 - `scripts/lib/opus-metadata.py`: shared Opus metadata and artwork helper.
-- `setup.sh`: installs command symlinks in `~/bin`.
+- `setup.sh`: installs only `~/bin/navidrome-tools` and removes known old
+  repository-owned `audio-*` symlinks, preserving unrelated links and regular files.
+- `tests/test_menu.py`: isolated menu routing, cancellation, and exit-status tests.
+- `tests/test_setup.py`: isolated installation and legacy-link cleanup tests.
 - `tests/test_youtube_workflow.py`: offline integration tests using temporary media.
 - `README.md`: command usage, configuration, and audio policies.
 
@@ -53,6 +58,7 @@ This repository contains command-line tools for preparing audio for Navidrome.
 - `.env` contains private local configuration. Do not expose its contents in
   responses, logs, tests, or committed files. Use placeholders in examples.
 - Do not run `setup.sh` as a routine check: it changes links in `~/bin`.
-- When adding a command, update its registration in `setup.sh` and its README
-  usage together.
+- When adding an audio action, update the menu, its tests, and README/docs usage
+  together. Keep `navidrome-tools` as the only installed command; do not reinstall
+  individual `audio-*` shortcuts.
 - Document behavior available in this checkout; do not promise pending features.

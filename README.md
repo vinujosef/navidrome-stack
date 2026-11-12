@@ -32,19 +32,22 @@ Setup installs only `navidrome-tools` and removes old repository-owned `audio-*`
 shortcuts, including links to the former `navidrome-stack` location. Scripts remain
 in `scripts/` for direct use with Bash and batch arguments.
 
-## Commands
+## Menu actions
 
-| Command | Purpose |
-|---|---|
-| [`audio-youtube-download`](docs/commands.md#audio-youtube-download) | Download source audio without re-encoding |
-| [`audio-filename-fix`](docs/commands.md#audio-filename-fix) | Fix common filename patterns |
-| [`audio-flac-to-m4a`](docs/commands.md#audio-flac-to-m4a) | Convert FLAC to AAC at 256 kbps |
-| [`audio-alac-to-aac`](docs/commands.md#audio-alac-to-aac) | Convert ALAC to AAC at 256 kbps; keep originals |
-| [`audio-album-fix`](docs/commands.md#audio-album-fix) | Fix album grouping and track tags |
-| [`audio-cover-art-fix`](docs/commands.md#audio-cover-art-fix) | Replace embedded artwork |
-| [`audio-trim`](docs/commands.md#audio-trim) | Trim to AAC at source bitrate, capped at 256 kbps; overwrites existing output |
-| [`audio-metadata-normalize`](docs/commands.md#audio-metadata-normalize) | Normalize artist and composer names |
-| [`audio-publish`](docs/commands.md#audio-publish) | Upload M4A/Opus files to your server |
+Run `navidrome-tools` and choose a number:
+
+| Option | Action | Purpose |
+|---|---|---|
+| 1 | [Download audio from YouTube](docs/commands.md#audio-youtube-download) | Download source audio without re-encoding |
+| 2 | [Fix filenames](docs/commands.md#audio-filename-fix) | Fix common filename patterns |
+| 3 | [Convert FLAC to AAC](docs/commands.md#audio-flac-to-m4a) | Convert at 256 kbps; keep originals |
+| 4 | [Convert ALAC to AAC](docs/commands.md#audio-alac-to-aac) | Convert at 256 kbps; keep originals |
+| 5 | [Fix album and track tags](docs/commands.md#audio-album-fix) | Fix album grouping and track tags |
+| 6 | [Replace cover art](docs/commands.md#audio-cover-art-fix) | Replace embedded artwork |
+| 7 | [Trim audio](docs/commands.md#audio-trim) | Trim to AAC at source bitrate, capped at 256 kbps; overwrites existing output |
+| 8 | [Normalize artist and composer names](docs/commands.md#audio-metadata-normalize) | Preview changes or review and apply them |
+| 9 | [Publish to Navidrome](docs/commands.md#audio-publish) | Upload M4A/Opus files to your server |
+| 0 | Exit | Quit without running an action |
 
 ## Example workflow
 

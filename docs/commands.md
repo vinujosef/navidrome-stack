@@ -2,7 +2,12 @@
 
 [Back to README](../README.md) · [Setup and configuration](setup.md)
 
-Use `navidrome-tools` for the interactive menu. The command names below identify
+Use `navidrome-tools` for the interactive menu. Choose an action and answer its
+prompts; the menu exits after the command finishes and returns its exit status.
+Run `navidrome-tools` again for another action. Blank required inputs or choosing
+Cancel exit without running an action.
+
+The command names below identify
 the underlying scripts; for direct use, replace a command such as `audio-trim`
 with `bash /path/to/navidrome-tools/scripts/audio-trim.sh`. Setup no longer installs
 individual `audio-*` shortcuts.

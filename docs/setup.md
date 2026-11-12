@@ -22,9 +22,9 @@ From the repository root:
 bash setup.sh
 ```
 
-This creates `~/bin` if needed and links commands to the scripts in this repo.
-Edits to existing scripts are available immediately through those links.
-The installer can replace existing files or links with the same command names.
+This creates `~/bin` if needed and links `navidrome-tools` to the menu script in
+this repo. Edits to existing scripts take effect without reinstalling.
+The installer can replace an existing file or link named `~/bin/navidrome-tools`.
 
 Ensure `~/bin` is in your `PATH`. If it is missing, add this line once to
 `~/.zshrc`, then open a new terminal:
@@ -35,7 +35,11 @@ export PATH="$HOME/bin:$PATH"
 
 Setup installs `navidrome-tools` and removes old repository-owned `audio-*`
 shortcuts, including those pointing to the former `navidrome-stack` location.
-Unrelated links and regular files are kept.
+Cleanup preserves unrelated links and regular files.
+
+From an album folder, run `navidrome-tools`, choose an action, and answer its
+prompts. The menu exits after that action finishes, including after publishing.
+Run it again whenever you want another action.
 
 Rerun `bash setup.sh` after moving the repo or losing the menu link.
 
