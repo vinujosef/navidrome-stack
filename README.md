@@ -1,4 +1,4 @@
-# navidrome-stack
+# navidrome-tools
 
 Command-line tools to prepare audio files and publish them to Navidrome.
 
@@ -12,6 +12,25 @@ bash setup.sh
 ```
 
 Ensure `~/bin` is in your `PATH`. Commands then work from any album folder.
+
+## Interactive menu
+
+From an album folder, run:
+
+```bash
+navidrome-tools
+```
+
+Choose a numbered action and answer its prompts. The menu exits when that action
+finishes, returning the command’s exit status. Run `navidrome-tools` again for another
+action. It operates in your current folder and uses the existing audio
+commands, including their confirmations. Enter paths without surrounding quotes;
+spaces are supported. Blank required inputs cancel and exit; `0` exits the menu.
+Metadata normalization offers preview or review-and-apply modes.
+
+Setup installs only `navidrome-tools` and removes old repository-owned `audio-*`
+shortcuts, including links to the former `navidrome-stack` location. Scripts remain
+in `scripts/` for direct use with Bash and batch arguments.
 
 ## Commands
 
@@ -33,10 +52,8 @@ For an album folder containing tracks named `01. Song.m4a` or `01. Song.opus`:
 
 ```bash
 cd "Artist - Album"
-audio-album-fix
-audio-cover-art-fix cover.jpg
-audio-metadata-normalize --dry-run
-audio-publish
+navidrome-tools
+# Run again for each step: album tags, cover art, metadata preview, then publish.
 ```
 
 Publishing applies metadata normalization before uploading. Metadata and artwork

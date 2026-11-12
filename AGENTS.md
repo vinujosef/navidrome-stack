@@ -1,4 +1,4 @@
-# Working in navidrome-stack
+# Working in navidrome-tools
 
 This repository contains command-line tools for preparing audio for Navidrome.
 

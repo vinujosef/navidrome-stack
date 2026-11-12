@@ -2,6 +2,11 @@
 
 [Back to README](../README.md) · [Setup and configuration](setup.md)
 
+Use `navidrome-tools` for the interactive menu. The command names below identify
+the underlying scripts; for direct use, replace a command such as `audio-trim`
+with `bash /path/to/navidrome-tools/scripts/audio-trim.sh`. Setup no longer installs
+individual `audio-*` shortcuts.
+
 Date and Original Release Date refer to the movie release date in this library.
 
 ## Audio format policy

@@ -5,7 +5,7 @@ BIN_DIR="$HOME/bin"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_DIR="$REPO_DIR/scripts"
 
-echo "🔧 Setting up navidrome-stack scripts..."
+echo "🔧 Setting up navidrome-tools scripts..."
 
 mkdir -p "$BIN_DIR"
 
@@ -37,33 +37,30 @@ link_script() {
 remove_legacy_link() {
   local command_name="$1"
   local target_file="$BIN_DIR/$command_name"
+  local destination
 
   if [ -L "$target_file" ]; then
-    rm "$target_file"
-    echo "🧹 Removed old command: $command_name"
+    destination="$(readlink "$target_file")"
+    case "$destination" in
+      "$SCRIPT_DIR/$command_name.sh"|"$REPO_DIR/../navidrome-stack/scripts/$command_name.sh"|"$(dirname "$REPO_DIR")/navidrome-stack/scripts/$command_name.sh")
+        rm "$target_file"
+        echo "🧹 Removed old command: $command_name"
+        ;;
+      *) echo "⚠️ Kept unrelated link: $target_file" ;;
+    esac
+  elif [ -e "$target_file" ]; then
+    echo "⚠️ Kept existing file: $target_file"
   fi
 }
 
-link_script "$SCRIPT_DIR/audio-trim.sh" "audio-trim"
-link_script "$SCRIPT_DIR/audio-flac-to-m4a.sh" "audio-flac-to-m4a"
-link_script "$SCRIPT_DIR/audio-alac-to-aac.sh" "audio-alac-to-aac"
-link_script "$SCRIPT_DIR/audio-filename-fix.sh" "audio-filename-fix"
-link_script "$SCRIPT_DIR/audio-album-fix.sh" "audio-album-fix"
-link_script "$SCRIPT_DIR/audio-cover-art-fix.sh" "audio-cover-art-fix"
-link_script "$SCRIPT_DIR/audio-metadata-normalize.sh" "audio-metadata-normalize"
-link_script "$SCRIPT_DIR/audio-youtube-download.sh" "audio-youtube-download"
-link_script "$SCRIPT_DIR/audio-publish.sh" "audio-publish"
+for command_name in audio-trim audio-flac-to-m4a audio-alac-to-aac \
+  audio-filename-fix audio-album-fix audio-cover-art-fix \
+  audio-metadata-normalize audio-youtube-download audio-publish \
+  audio-backup audio-loudness; do
+  remove_legacy_link "$command_name"
+done
+
+link_script "$SCRIPT_DIR/navidrome-tools.sh" "navidrome-tools"
 
 echo ""
-echo "✅ Setup complete."
-echo ""
-echo "You can now run:"
-echo "- audio-trim"
-echo "- audio-flac-to-m4a"
-echo "- audio-alac-to-aac"
-echo "- audio-filename-fix"
-echo "- audio-album-fix"
-echo "- audio-cover-art-fix"
-echo "- audio-metadata-normalize"
-echo "- audio-youtube-download"
-echo "- audio-publish"
+echo "✅ Setup complete. Run navidrome-tools to open the menu."

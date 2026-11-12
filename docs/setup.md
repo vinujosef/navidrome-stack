@@ -33,7 +33,11 @@ Ensure `~/bin` is in your `PATH`. If it is missing, add this line once to
 export PATH="$HOME/bin:$PATH"
 ```
 
-Rerun `bash setup.sh` after moving the repo, adding a command, or losing a link.
+Setup installs `navidrome-tools` and removes old repository-owned `audio-*`
+shortcuts, including those pointing to the former `navidrome-stack` location.
+Unrelated links and regular files are kept.
+
+Rerun `bash setup.sh` after moving the repo or losing the menu link.
 
 ## Private configuration
 
